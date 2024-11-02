@@ -1,9 +1,8 @@
-streamlit==1.20.0
-numpy==1.23.5
-opencv-python==4.7.0.72
-opencv-python-headless==4.7.0.72
-scikit-learn==1.2.0
-google-api-python-client==2.60.0
-google-auth==2.16.0
-google-auth-oauthlib==0.4.6
-google-auth-httplib2==0.1.0
+streamlit
+numpy
+opencv-python-headless
+scikit-learn
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
