@@ -1,5 +1,8 @@
 streamlit
 numpy
-opencv-python-headless
-pickle5
+opencv-python
+scikit-learn
 google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
