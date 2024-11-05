@@ -164,12 +164,12 @@ def face_rec():
     name = st.text_input("Name")
 
     if st.button("Capture Face Data"):
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
         capture_face_data(name, cap)
 
     # Real-time face recognition
     if st.button("Run Face Recognition"):
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
         st.write("Starting face recognition...")
 
         # List files in the Google Drive folder
