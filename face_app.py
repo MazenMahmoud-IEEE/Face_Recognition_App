@@ -33,6 +33,11 @@ def capture_face_data(name, cap):
     placeholder = st.empty()
 
     skip = 0
+    # Check for stop condition
+    if st.button("Stop capturing facial data",key="btn4"):
+        cap.release()
+        cv2.destroyAllWindows()
+
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -146,10 +151,14 @@ def train_model(face_data, labels):
     clf.fit(all_face_data, all_labels)
     return clf
 
-# Main App
-def main():
-    st.title("Face Recognition App")
+def face_rec():
     placeholder = st.empty()
+
+    
+    # Check for stop condition
+    if st.button("Stop face recognition",key="btn4"):
+        cap.release()
+        cv2.destroyAllWindows()
 
     # Load the existing model
     clf = load_model()
@@ -208,6 +217,11 @@ def main():
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
             placeholder.image(frame, channels="BGR")
+
+# Main App
+def main():
+    st.title("Face Recognition App")
+    face_rec()
 
 if __name__ == "__main__":
     main()
