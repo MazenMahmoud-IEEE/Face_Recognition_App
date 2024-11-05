@@ -169,7 +169,7 @@ def face_rec():
 
     # Real-time face recognition
     if st.button("Run Face Recognition"):
-        cap = cv2.VideoCapture(0)
+        frame = st.camera_input("face_recognition")
         st.write("Starting face recognition...")
 
         # List files in the Google Drive folder
@@ -196,7 +196,6 @@ def face_rec():
             cv2.destroyAllWindows()
 
         while True:
-            frame = st.camera_input("face_recognition")
             if frame is not None :
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 faces = face_cascade.detectMultiScale(gray, 1.3, 5)
