@@ -4,5 +4,6 @@ opencv-python
 scikit-learn
 google-api-python-client
 google-auth
+opencv-python-headless
 google-auth-oauthlib
 google-auth-httplib2
