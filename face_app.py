@@ -196,12 +196,10 @@ def face_rec():
             cv2.destroyAllWindows()
 
         while True:
-            ret, frame = cap.read()
-            if not ret:
-                continue
-
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+            frame = st.camera_input("face_recognition")
+            if frame is not None :
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
             for (x, y, w, h) in faces:
                 face_section = frame[y - 5:y + h + 5, x - 5:x + w + 5]
