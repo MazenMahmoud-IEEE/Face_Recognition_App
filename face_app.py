@@ -17,7 +17,7 @@ face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
 def upload_to_drive(file_path, file_name):
     SCOPES = ['https://www.googleapis.com/auth/drive.file']
     creds = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"])
+    st.secrets["gcp"])
     drive_service = build('drive', 'v3', credentials=creds)
 
     file_metadata = {'name': file_name, 'parents': ['17kt0LrNDI5IZpvwMML-S6r_kjGy5jLgR']}
@@ -77,7 +77,7 @@ def capture_face_data(name, cap):
 # Google Drive File Listing
 def list_files_in_folder(folder_id):
     creds = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"])
+    st.secrets["gcp"])
                                         
     drive_service = build('drive', 'v3', credentials=creds)
 
