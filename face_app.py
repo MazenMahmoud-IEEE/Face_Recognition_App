@@ -17,7 +17,7 @@ face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
 def upload_to_drive(file_path, file_name):
     SCOPES = ['https://www.googleapis.com/auth/drive.file']
     creds = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp"])
+        st.secrets["gcp"])
     drive_service = build('drive', 'v3', credentials=creds)
 
     file_metadata = {'name': file_name, 'parents': ['17kt0LrNDI5IZpvwMML-S6r_kjGy5jLgR']}
@@ -26,46 +26,46 @@ def upload_to_drive(file_path, file_name):
     return file.get('id')
 
 # Function for face data capture
-def capture_face_data(name, cap):
+def capture_face_data(name):
     progress_placeholder = st.empty()  # Placeholder for updating progress
     face_data = []
     st.write("Processing...")
     placeholder = st.empty()
 
     skip = 0
+
     # Check for stop condition
-    if st.button("Stop capturing facial data",key="btn4"):
-        cap.release()
-        cv2.destroyAllWindows()
+    if st.button("Stop capturing facial data", key="btn4"):
+        return
 
+    # Create a placeholder for video capture
+    video_placeholder = st.empty()
     while True:
-        ret, frame = cap.read()
-        if not ret:
-            continue
+        frame = video_placeholder.camera_input("Capture your face", key="camera_input")
 
-        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
+        if frame is not None:
+            frame = cv2.imdecode(np.frombuffer(frame.getvalue(), np.uint8), cv2.IMREAD_COLOR)
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
 
-        for face in faces[:1]:  # Only the largest face
-            x, y, w, h = face
-            offset = 5
-            face_offset = frame[y - offset:y + h + offset, x - offset:x + w + offset]
-            face_selection = cv2.resize(face_offset, (100, 100))
+            for face in faces[:1]:  # Only the largest face
+                x, y, w, h = face
+                offset = 5
+                face_offset = frame[y - offset:y + h + offset, x - offset:x + w + offset]
+                face_selection = cv2.resize(face_offset, (100, 100))
 
-            if skip % 10 == 0:
-                face_data.append(face_selection)
-                st.write(f"Processing: {len(face_data)}%")
+                if skip % 10 == 0:
+                    face_data.append(face_selection)
+                    st.write(f"Processing: {len(face_data)}%")
 
-            skip += 1
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                skip += 1
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        if len(face_data) >= 100:
-            break
+            if len(face_data) >= 100:
+                break
 
-        placeholder.image(frame, channels="BGR")
-    
-    cap.release()
-    cv2.destroyAllWindows()
+            placeholder.image(frame, channels="BGR")
+
     face_data = np.array(face_data)
     face_data = face_data.reshape((face_data.shape[0], -1))
     np.save(f'./face_dataset/{name}.npy', face_data)
@@ -77,12 +77,12 @@ def capture_face_data(name, cap):
 # Google Drive File Listing
 def list_files_in_folder(folder_id):
     creds = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp"])
-                                        
+        st.secrets["gcp"])
+
     drive_service = build('drive', 'v3', credentials=creds)
 
     query = f"'{folder_id}' in parents"
-    
+
     try:
         results = drive_service.files().list(q=query, fields="files(id, name)").execute()
         return results.get('files', []), drive_service
@@ -98,7 +98,7 @@ def load_face_data(drive_service, items):
 
     for item in items:
         file_name = item['name']
-        
+
         if file_name.endswith('.npy'):
             # Store name mapping
             names[class_id] = file_name[:-4]
@@ -108,7 +108,7 @@ def load_face_data(drive_service, items):
             file_stream = BytesIO()
             downloader = MediaIoBaseDownload(file_stream, request)
             done = False
-            
+
             while done is False:
                 status, done = downloader.next_chunk()
                 st.write(f'Download {int(status.progress() * 100)}%.')
@@ -164,12 +164,10 @@ def face_rec():
     name = st.text_input("Name")
 
     if st.button("Capture Face Data"):
-        cap = cv2.VideoCapture(0)
-        capture_face_data(name, cap)
+        capture_face_data(name)
 
     # Real-time face recognition
     if st.button("Run Face Recognition"):
-        frame = st.camera_input("face_recognition")
         st.write("Starting face recognition...")
 
         # List files in the Google Drive folder
@@ -190,29 +188,29 @@ def face_rec():
         # Save the updated model
         save_model(clf)
 
-        # Check for stop condition
-        if st.button("Stop face recognition",key="btn4"):
-            cap.release()
-            cv2.destroyAllWindows()
-
+        video_placeholder = st.empty()
         while True:
-            if frame is not None :
+            frame = video_placeholder.camera_input("Run face recognition", key="camera_input")
+
+            if frame is not None:
+                frame = cv2.imdecode(np.frombuffer(frame.getvalue(), np.uint8), cv2.IMREAD_COLOR)
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
-            for (x, y, w, h) in faces:
-                face_section = frame[y - 5:y + h + 5, x - 5:x + w + 5]
-                face_section = cv2.resize(face_section, (100, 100)).flatten().reshape(1, -1)
+                for (x, y, w, h) in faces:
+                    face_section = frame[y - 5:y + h + 5, x - 5:x + w + 5]
+                    face_section = cv2.resize(face_section, (100, 100)).flatten().reshape(1, -1)
 
-                prediction = clf.predict(face_section)[0]
-                user = names[int(prediction)]
-                st.write(f"Recognized: {user}")
+                    prediction = clf.predict(face_section)[0]
+                    user = names[int(prediction)]
+                    st.write(f"Recognized: {user}")
 
-                cv2.putText(frame, user, (x + 20, y - 10), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cv2.putText(frame, user, (x + 20, y - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-            placeholder.image(frame, channels="BGR")
+                # Display the frame
+                video_placeholder.image(frame, channels="BGR")
 
 # Main App
 def main():
