@@ -154,12 +154,6 @@ def train_model(face_data, labels):
 def face_rec():
     placeholder = st.empty()
 
-    
-    # Check for stop condition
-    if st.button("Stop face recognition",key="btn4"):
-        cap.release()
-        cv2.destroyAllWindows()
-
     # Load the existing model
     clf = load_model()
     if clf is not None:
@@ -195,6 +189,11 @@ def face_rec():
 
         # Save the updated model
         save_model(clf)
+
+        # Check for stop condition
+        if st.button("Stop face recognition",key="btn4"):
+            cap.release()
+            cv2.destroyAllWindows()
 
         while True:
             ret, frame = cap.read()
