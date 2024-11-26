@@ -1,9 +1,9 @@
 streamlit
+opencv-python-headless
 numpy
 opencv-python
 scikit-learn
 google-api-python-client
 google-auth
 google-auth-oauthlib
-opencv-python-headless
 google-auth-httplib2
