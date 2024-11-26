@@ -59,7 +59,7 @@ def capture_face_data(name, cap):
             skip += 1
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        if len(face_data) >= 100:
+        if len(face_data) >= 150:
             break
 
         placeholder.image(frame, channels="BGR")
