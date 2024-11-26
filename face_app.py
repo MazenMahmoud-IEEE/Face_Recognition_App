@@ -158,6 +158,10 @@ def face_rec():
     clf = load_model()
     if clf is not None:
         st.write("Loaded existing model.")
+    
+    # User Input
+    st.write("Enter the name for data capture:")
+    name = st.text_input("Name")
 
     if st.button("Capture Face Data"):
         cap = cv2.VideoCapture(0)
@@ -213,9 +217,7 @@ def face_rec():
 
             placeholder.image(frame, channels="BGR")
         
-    # User Input
-    st.write("Enter the name for data capture:")
-    name = st.text_input("Name")
+
 
 # Main App
 def main():
