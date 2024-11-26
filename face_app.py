@@ -16,8 +16,8 @@ face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
 # Google Drive Setup (optional)
 def upload_to_drive(file_path, file_name):
     SCOPES = ['https://www.googleapis.com/auth/drive.file']
-    creds = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp"])
+    creds = service_account.Credentials.from_service_account_file(
+        r".\face-recognition-app-440518-e50c6b2c8d3a.json", scopes=SCOPES)
     drive_service = build('drive', 'v3', credentials=creds)
 
     file_metadata = {'name': file_name, 'parents': ['17kt0LrNDI5IZpvwMML-S6r_kjGy5jLgR']}
@@ -76,9 +76,9 @@ def capture_face_data(name, cap):
 
 # Google Drive File Listing
 def list_files_in_folder(folder_id):
-    creds = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp"])
-                                        
+    SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+    creds = service_account.Credentials.from_service_account_file(
+        r".\face-recognition-app-440518-e50c6b2c8d3a.json", scopes=SCOPES)
     drive_service = build('drive', 'v3', credentials=creds)
 
     query = f"'{folder_id}' in parents"
@@ -159,17 +159,13 @@ def face_rec():
     if clf is not None:
         st.write("Loaded existing model.")
 
-    # User Input
-    st.write("Enter the name for data capture:")
-    name = st.text_input("Name")
-
     if st.button("Capture Face Data"):
         cap = cv2.VideoCapture(0)
         capture_face_data(name, cap)
 
     # Real-time face recognition
     if st.button("Run Face Recognition"):
-        frame = st.camera_input("face_recognition")
+        cap = cv2.VideoCapture(0)
         st.write("Starting face recognition...")
 
         # List files in the Google Drive folder
@@ -196,9 +192,12 @@ def face_rec():
             cv2.destroyAllWindows()
 
         while True:
-            if frame is not None :
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+            ret, frame = cap.read()
+            if not ret:
+                continue
+
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
             for (x, y, w, h) in faces:
                 face_section = frame[y - 5:y + h + 5, x - 5:x + w + 5]
@@ -213,6 +212,10 @@ def face_rec():
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
             placeholder.image(frame, channels="BGR")
+        
+    # User Input
+    st.write("Enter the name for data capture:")
+    name = st.text_input("Name")
 
 # Main App
 def main():
