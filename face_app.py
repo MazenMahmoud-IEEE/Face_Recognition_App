@@ -54,7 +54,7 @@ def capture_face_data(name, cap):
 
             if skip % 10 == 0:
                 face_data.append(face_selection)
-                st.write(f"Processing: {len(face_data)}%")
+                st.write(f"Processing: {len(face_data)} / 150")
 
             skip += 1
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
